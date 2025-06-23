@@ -1,0 +1,37 @@
+# render.yaml
+# This file configures the deployment of the reelnn-backend on Render.
+# It defines two services: a free MongoDB database and a free Node.js web service.
+
+services:
+  # 1. The Database Service (MongoDB)
+  #    This service creates a new MongoDB instance on Render's free plan.
+  - type: mongodb
+    name: reelnn-database
+    plan: free # Specifies the free tier for the database.
+
+  # 2. The Web Service (Node.js Backend)
+  #    This service deploys the Node.js application.
+  - type: web
+    name: reelnn-backend
+    runtime: node
+    plan: free # Specifies the free tier for the web service.
+    repo: https://github.com/AgPirosbabws/reelnn-backend # The GitHub repository to deploy from.
+    branch: main # The branch to deploy
+    # Build and Start Commands
+    # Render runs these commands to build and start your application.
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+
+    # Environment Variables
+    # These are injected into your application's environment.
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_SECRET
+        generateValue: true # This is a secure way to handle secrets. Render will automatically generate a random, secure string for you.
+      - key: MONGO_URI
+        fromDatabase:
+          name: reelnn-database # This must match the name of the database service defined above.
+          property: connectionString # This tells Render to get the connection string from the database service.
