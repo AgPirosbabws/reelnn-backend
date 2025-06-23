@@ -1,37 +1,27 @@
 # render.yaml
-# This file configures the deployment of the reelnn-backend on Render.
-# It defines two services: a free MongoDB database and a free Node.js web service.
+# This file defines the web service for the reelnn-backend.
+# The database will be hosted on MongoDB Atlas and connected via an environment variable.
 
 services:
-  # 1. The Database Service (MongoDB)
-  #    This service creates a new MongoDB instance on Render's free plan.
-  - type: mongodb
-    name: reelnn-database
-    plan: free # Specifies the free tier for the database.
-
-  # 2. The Web Service (Node.js Backend)
-  #    This service deploys the Node.js application.
+  # The Web Service (Node.js Backend)
   - type: web
     name: reelnn-backend
     runtime: node
-    plan: free # Specifies the free tier for the web service.
-    repo: https://github.com/AgPirosbabws/reelnn-backend # The GitHub repository to deploy from.
-    branch: main # The branch to deploy
+    plan: free # Use the free instance type
+    repo: https://github.com/AgPirosbabws/reelnn-backend
+    branch: main
+    
     # Build and Start Commands
-    # Render runs these commands to build and start your application.
     buildCommand: "npm install"
     startCommand: "node server.js"
 
     # Environment Variables
-    # These are injected into your application's environment.
+    # NOTE: The MONGO_URI must be added manually in the Render dashboard
+    # after connecting to a free MongoDB Atlas database.
     envVars:
       - key: NODE_ENV
         value: production
       - key: JWT_EXPIRE
         value: 7d
       - key: JWT_SECRET
-        generateValue: true # This is a secure way to handle secrets. Render will automatically generate a random, secure string for you.
-      - key: MONGO_URI
-        fromDatabase:
-          name: reelnn-database # This must match the name of the database service defined above.
-          property: connectionString # This tells Render to get the connection string from the database service.
+        generateValue: true # Render will securely generate a random value for this.
